@@ -1,4 +1,4 @@
-package chat.app.ChatApp;
+package chat.app;
 
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Promise;
