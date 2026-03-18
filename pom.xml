@@ -68,6 +68,11 @@
       <classifier>processor</classifier>
       <scope>provided</scope>
     </dependency>
+    <dependency>
+      <groupId>io.vertx</groupId>
+      <artifactId>vertx-pg-client</artifactId>
+      <version>5.0.8</version>
+    </dependency>
   </dependencies>
 
   <build>

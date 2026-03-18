@@ -6,8 +6,20 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+      </profile>
+      <profile name="Annotation profile for ChatApp" enabled="true">
+        <sourceOutputDir name="src/main/generated" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <option name="outputDirectory" value="C:\Users\ounza\IMT\A2\SCALE\ChatApp/src/main" />
+        <processor name="io.vertx.codegen.CodeGenProcessor" />
         <module name="ChatApp" />
       </profile>
     </annotationProcessing>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="ChatApp" options="-AoutputDirectory=C:\Users\ounza\IMT\A2\SCALE\ChatApp/src/main" />
+    </option>
   </component>
 </project>

@@ -1,4 +1,75 @@
 package chat.app.ChatApp.database;
 
-public class DatabaseVerticle {
+import io.vertx.core.AbstractVerticle;
+import io.vertx.core.Promise;
+import io.vertx.core.json.JsonObject;
+import io.vertx.pgclient.PgBuilder;
+import io.vertx.pgclient.PgConnectOptions;
+import io.vertx.serviceproxy.ProxyHelper;
+import io.vertx.sqlclient.PoolOptions;
+import io.vertx.sqlclient.SqlClient;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Properties;
+
+public class DatabaseVerticle extends AbstractVerticle {
+  public static final String CONFIG_WIKIDB_JDBC_URL = "wikidb.jdbc.url";
+  public static final String CONFIG_WIKIDB_JDBC_DRIVER_CLASS = "wikidb.jdbc.driver_class";
+  public static final String CONFIG_WIKIDB_JDBC_MAX_POOL_SIZE = "wikidb.jdbc.max_pool_size";
+  public static final String CONFIG_WIKIDB_QUEUE = "wikidb.queue";
+  public static final String CONFIG_WIKIDB_SQL_QUERIES_RESOURCE_FILE = "wikidb.sqlqueries.resource.file";
+
+  private HashMap<SqlQuery, String> loadSqlQueries() throws IOException {
+    String queriesFile = config().getString(CONFIG_WIKIDB_SQL_QUERIES_RESOURCE_FILE);
+    InputStream queriesInputStream;
+    if (queriesFile != null) {
+      queriesInputStream = new FileInputStream(queriesFile);
+    } else {
+      queriesInputStream = getClass().getResourceAsStream("/db-queries.properties");
+    }
+    Properties queriesProps = new Properties();
+    queriesProps.load(queriesInputStream);
+    queriesInputStream.close();
+    HashMap<SqlQuery, String> sqlQueries = new HashMap<>();
+    sqlQueries.put(SqlQuery.CREATE_MESSAGES_TABLE, queriesProps.getProperty("create-pages-table"));
+    sqlQueries.put(SqlQuery.ALL_MESSAGES, queriesProps.getProperty("all-pages"));
+    sqlQueries.put(SqlQuery.CREATE_MESSAGE, queriesProps.getProperty("create-page"));
+    return sqlQueries;
+  }
+  @Override
+  public void start(Promise<Void> startPromise) throws Exception {
+    HashMap<SqlQuery, String> sqlQueries = loadSqlQueries();
+
+    PgConnectOptions connectOptions = new PgConnectOptions()
+      .setPort(5432)
+      .setHost("the-host")
+      .setDatabase("the-db")
+      .setUser("user")
+      .setPassword("secret");
+
+    // Pool options
+    PoolOptions poolOptions = new PoolOptions()
+      .setMaxSize(5);
+
+    // Create the pooled client
+    SqlClient client = PgBuilder
+      .client()
+      .with(poolOptions)
+      .connectingTo(connectOptions)
+      .using(vertx)
+      .build();
+
+    DatabaseService.create(dbClient, sqlQueries, ready -> {
+      if (ready.succeeded()) {
+        ProxyHelper.registerService(DatabaseService.class, vertx, ready.result(),
+          CONFIG_WIKIDB_QUEUE);
+        startPromise.complete();
+      } else {
+        startPromise.fail(ready.cause());
+      }
+    });
+  }
 }
