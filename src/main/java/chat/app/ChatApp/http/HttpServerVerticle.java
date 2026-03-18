@@ -1,4 +1,4 @@
-package chat.app.http;
+package chat.app.ChatApp.http;
 
 public class HttpServerVerticle {
 }
