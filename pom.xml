@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>chat.app</groupId>
@@ -17,7 +17,7 @@
     <exec-maven-plugin.version>3.0.0</exec-maven-plugin.version>
 
     <vertx.version>4.5.25</vertx.version>
-    <junit-jupiter.version>5.9.1</junit-jupiter.version>
+    <junit-jupiter.version>5.10.1</junit-jupiter.version>
 
     <main.verticle>chat.app.ChatApp.MainVerticle</main.verticle>
     <launcher.class>io.vertx.core.Launcher</launcher.class>
@@ -60,6 +60,10 @@
     </dependency>
     <dependency>
       <groupId>io.vertx</groupId>
+      <artifactId>vertx-web-templ-freemarker</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.vertx</groupId>
       <artifactId>vertx-service-proxy</artifactId>
     </dependency>
     <dependency>
@@ -73,6 +77,17 @@
       <artifactId>vertx-pg-client</artifactId>
       <version>5.0.8</version>
     </dependency>
+    <dependency>
+      <groupId>com.github.rjeschke</groupId>
+      <artifactId>txtmark</artifactId>
+      <version>0.13</version>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>2.0.17</version>
+      <scope>compile</scope>
+    </dependency>
   </dependencies>
 
   <build>
@@ -81,7 +96,15 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>${maven-compiler-plugin.version}</version>
         <configuration>
-          <release>17</release>
+          <release>21</release>
+          <useIncrementalCompilation>false</useIncrementalCompilation>
+          <annotationProcessors>
+            <annotationProcessor>io.vertx.codegen.CodeGenProcessor</annotationProcessor>
+          </annotationProcessors>
+          <generatedSourcesDirectory>${project.basedir}/src/main/generated</generatedSourcesDirectory>
+          <compilerArgs>
+            <arg>-AoutputDirectory=${project.basedir}/src/main</arg>
+          </compilerArgs>
         </configuration>
       </plugin>
       <plugin>
@@ -127,21 +150,6 @@
         </configuration>
       </plugin>
       <plugin>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>${maven-compiler-plugin.version}</version>
-        <configuration>
-          <release>21</release>
-          <useIncrementalCompilation>false</useIncrementalCompilation>
-          <annotationProcessors>
-            <annotationProcessor>io.vertx.codegen.CodeGenProcessor</annotationProcessor>
-          </annotationProcessors>
-          <generatedSourcesDirectory>${project.basedir}/src/main/generated</generatedSourcesDirectory>
-          <compilerArgs>
-            <arg>-AoutputDirectory=${project.basedir}/src/main</arg>
-          </compilerArgs>
-        </configuration>
-      </plugin>
-      <plugin>
         <artifactId>maven-clean-plugin</artifactId>
         <version>3.0.0</version>
         <configuration>
@@ -154,6 +162,4 @@
       </plugin>
     </plugins>
   </build>
-
-
 </project>
