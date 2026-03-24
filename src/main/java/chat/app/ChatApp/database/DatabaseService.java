@@ -6,18 +6,21 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonArray;
-import io.vertx.core.json.JsonObject;
-
+import io.vertx.sqlclient.SqlClient;
 import java.util.HashMap;
 
 @ProxyGen
 public interface DatabaseService {
+
   @Fluent
   DatabaseService fetchMessages(Handler<AsyncResult<JsonArray>> resultHandler);
   @Fluent
-  DatabaseService createMessage(String message, Handler<AsyncResult<Void>> resultHandler);
-  static DatabaseService create(JDBCClient dbClient, HashMap<SqlQuery, String> sqlQueries, Handler<AsyncResult<DatabaseService>> readyHandler) {
-    return new DatabaseServiceImpl(dbClient, sqlQueries, readyHandler);
+  DatabaseService createMessage(String sender, String message, Handler<AsyncResult<Void>> resultHandler);
+
+  static DatabaseService create(SqlClient sqlClient,
+                                HashMap<SqlQuery, String> sqlQueries,
+                                Handler<AsyncResult<DatabaseService>> readyHandler) {
+    return new DatabaseServiceImpl(sqlClient, sqlQueries, readyHandler);
   }
   static DatabaseService createProxy(Vertx vertx, String address) {
     return new DatabaseServiceVertxEBProxy(vertx, address);

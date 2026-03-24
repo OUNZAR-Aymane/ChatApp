@@ -16,11 +16,9 @@ import java.util.HashMap;
 import java.util.Properties;
 
 public class DatabaseVerticle extends AbstractVerticle {
-  public static final String CONFIG_WIKIDB_JDBC_URL = "wikidb.jdbc.url";
-  public static final String CONFIG_WIKIDB_JDBC_DRIVER_CLASS = "wikidb.jdbc.driver_class";
-  public static final String CONFIG_WIKIDB_JDBC_MAX_POOL_SIZE = "wikidb.jdbc.max_pool_size";
-  public static final String CONFIG_WIKIDB_QUEUE = "wikidb.queue";
-  public static final String CONFIG_WIKIDB_SQL_QUERIES_RESOURCE_FILE = "wikidb.sqlqueries.resource.file";
+
+  public static final String CONFIG_WIKIDB_QUEUE = "chatdb.queue";
+  public static final String CONFIG_WIKIDB_SQL_QUERIES_RESOURCE_FILE = "chatdb.sqlqueries.resource.file";
 
   private HashMap<SqlQuery, String> loadSqlQueries() throws IOException {
     String queriesFile = config().getString(CONFIG_WIKIDB_SQL_QUERIES_RESOURCE_FILE);
@@ -45,7 +43,7 @@ public class DatabaseVerticle extends AbstractVerticle {
 
     PgConnectOptions connectOptions = new PgConnectOptions()
       .setPort(5432)
-      .setHost("the-host")
+      .setHost("localhost")
       .setDatabase("the-db")
       .setUser("user")
       .setPassword("secret");
@@ -55,7 +53,7 @@ public class DatabaseVerticle extends AbstractVerticle {
       .setMaxSize(5);
 
     // Create the pooled client
-    SqlClient client = PgBuilder
+    SqlClient dbClient = PgBuilder
       .client()
       .with(poolOptions)
       .connectingTo(connectOptions)
@@ -64,8 +62,7 @@ public class DatabaseVerticle extends AbstractVerticle {
 
     DatabaseService.create(dbClient, sqlQueries, ready -> {
       if (ready.succeeded()) {
-        ProxyHelper.registerService(DatabaseService.class, vertx, ready.result(),
-          CONFIG_WIKIDB_QUEUE);
+        ProxyHelper.registerService(DatabaseService.class, vertx, ready.result(), CONFIG_WIKIDB_QUEUE);
         startPromise.complete();
       } else {
         startPromise.fail(ready.cause());
