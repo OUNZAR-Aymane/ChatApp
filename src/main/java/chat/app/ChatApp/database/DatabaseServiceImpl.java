@@ -79,8 +79,8 @@ public class DatabaseServiceImpl implements DatabaseService {
           LOGGER.error("Database query error", ar.cause());
           resultHandler.handle(Future.failedFuture(ar.cause()));
         }
+        dbClient.close();
       });
-    dbClient.close();
     return this;
   }
 
