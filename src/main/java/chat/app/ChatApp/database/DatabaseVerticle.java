@@ -5,6 +5,7 @@ import io.vertx.core.Promise;
 import io.vertx.core.json.JsonObject;
 import io.vertx.pgclient.PgBuilder;
 import io.vertx.pgclient.PgConnectOptions;
+import io.vertx.pgclient.SslMode;
 import io.vertx.serviceproxy.ProxyHelper;
 import io.vertx.sqlclient.PoolOptions;
 import io.vertx.sqlclient.SqlClient;
@@ -46,7 +47,8 @@ public class DatabaseVerticle extends AbstractVerticle {
       .setHost("localhost")
       .setDatabase("the-db")
       .setUser("user")
-      .setPassword("secret");
+      .setPassword("secret")
+      .setSslMode(SslMode.DISABLE);
 
     // Pool options
     PoolOptions poolOptions = new PoolOptions()
