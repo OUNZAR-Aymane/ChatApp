@@ -5,9 +5,15 @@
     <#if messages?? && messages?size gt 0>
       <#list messages as msg>
         <div class="message">
-          <strong>${msg.sender}</strong>
-          <span class="date">${msg.created_at}</span><br/>
-          ${msg.content}
+          <div class="message">
+            <div style="display: flex; justify-content: space-between; font-size: 0.9em; color: #555;">
+              <strong>${msg.sender}</strong>
+              <span class="date">${msg.created_at}</span>
+            </div>
+            <div style="margin-top: 2px;">
+              ${msg.content}
+            </div>
+          </div>
         </div>
       </#list>
     <#else>
