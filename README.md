@@ -25,6 +25,17 @@ CREATE DATABASE "the-db" OWNER "user";
 psql -d the-db -U user
 ```
 
+4. Then type `\q` to leave and then package your application:
+
+```bash
+./mvnw clean package
+```
+
+5. To run your application:
+```bash
+./mvnw clean compile exec:java
+```
+
 ## Alternative: Database setup with Docker
 
 Instead of installing PostgreSQL locally, you can use Docker.
