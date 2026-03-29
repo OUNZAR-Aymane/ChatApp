@@ -11,7 +11,7 @@
         <sourceOutputDir name="src/main/generated" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <option name="outputDirectory" value="C:\Users\ounza\IMT\A2\SCALE\ChatApp/src/main" />
+        <option name="outputDirectory" value="$PROJECT_DIR$/src/main" />
         <processor name="io.vertx.codegen.CodeGenProcessor" />
         <module name="ChatApp" />
       </profile>
@@ -19,7 +19,7 @@
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="ChatApp" options="-AoutputDirectory=C:\Users\ounza\IMT\A2\SCALE\ChatApp/src/main" />
+      <module name="ChatApp" options="-AoutputDirectory=$PROJECT_DIR$/src/main" />
     </option>
   </component>
 </project>
