@@ -66,7 +66,7 @@ public class DatabaseServiceVertxEBProxy implements DatabaseService {
   }
 
   @Override
-  public DatabaseService fetchMessages(Handler<AsyncResult<JsonArray>> resultHandler){
+  public DatabaseService getLastMessages(Handler<AsyncResult<JsonArray>> resultHandler){
     if (closed) {
       resultHandler.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
       return this;
@@ -74,8 +74,8 @@ public class DatabaseServiceVertxEBProxy implements DatabaseService {
     JsonObject _json = new JsonObject();
 
     DeliveryOptions _deliveryOptions = (_options != null) ? new DeliveryOptions(_options) : new DeliveryOptions();
-    _deliveryOptions.addHeader("action", "fetchMessages");
-    _deliveryOptions.getHeaders().set("action", "fetchMessages");
+    _deliveryOptions.addHeader("action", "getLastMessages");
+    _deliveryOptions.getHeaders().set("action", "getLastMessages");
     _vertx.eventBus().<JsonArray>request(_address, _json, _deliveryOptions, res -> {
       if (res.failed()) {
         resultHandler.handle(Future.failedFuture(res.cause()));
@@ -86,18 +86,17 @@ public class DatabaseServiceVertxEBProxy implements DatabaseService {
     return this;
   }
   @Override
-  public DatabaseService createMessage(String sender, String message, Handler<AsyncResult<Void>> resultHandler){
+  public DatabaseService addMessage(JsonObject message, Handler<AsyncResult<Void>> resultHandler){
     if (closed) {
       resultHandler.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
       return this;
     }
     JsonObject _json = new JsonObject();
-    _json.put("sender", sender);
     _json.put("message", message);
 
     DeliveryOptions _deliveryOptions = (_options != null) ? new DeliveryOptions(_options) : new DeliveryOptions();
-    _deliveryOptions.addHeader("action", "createMessage");
-    _deliveryOptions.getHeaders().set("action", "createMessage");
+    _deliveryOptions.addHeader("action", "addMessage");
+    _deliveryOptions.getHeaders().set("action", "addMessage");
     _vertx.eventBus().<Void>request(_address, _json, _deliveryOptions, res -> {
       if (res.failed()) {
         resultHandler.handle(Future.failedFuture(res.cause()));

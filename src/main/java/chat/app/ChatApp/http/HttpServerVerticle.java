@@ -4,6 +4,7 @@ import chat.app.ChatApp.database.DatabaseService;
 
 import io.vertx.core.*;
 import io.vertx.core.http.HttpServer;
+import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.BodyHandler;
@@ -29,8 +30,69 @@ public class HttpServerVerticle extends AbstractVerticle {
     Router router = Router.router(vertx);
     router.route().handler(BodyHandler.create());
 
-    router.get("/").handler(this::indexHandler);
-    router.post("/message").handler(this::messageCreationHandler);
+    // GET / -> render index.ftl
+    router.get("/").handler(ctx -> {
+      dbService.getLastMessages(reply -> {
+        if (reply.succeeded()) {
+          ctx.put("title", "Chat home");
+          ctx.put("messages", reply.result().getList());
+
+          templateEngine.render(ctx.data(), "templates/index.ftl", ar -> {
+            if (ar.succeeded()) {
+              ctx.response()
+                .putHeader("Content-Type", "text/html")
+                .end(ar.result());
+            } else {
+              ctx.fail(ar.cause());
+            }
+          });
+
+        } else {
+          LOGGER.error("Failed to fetch messages", reply.cause());
+          ctx.fail(reply.cause());
+        }
+      });
+    });
+
+    // GET /api/messages
+    router.get("/api/messages").handler(ctx -> {
+      dbService.getLastMessages(reply -> {
+        if (reply.succeeded()) {
+          ctx.response()
+            .putHeader("Content-Type", "application/json")
+            .end(reply.result().encode());
+        } else {
+          ctx.fail(reply.cause());
+        }
+      });
+    });
+
+    // POST /api/messages
+    router.post("/api/messages").handler(ctx -> {
+      String sender = ctx.request().getFormAttribute("sender");
+      String content = ctx.request().getFormAttribute("content");
+
+      if (sender == null || sender.isEmpty() || content == null || content.isEmpty()) {
+        ctx.response().setStatusCode(400).end("sender and content required");
+        return;
+      }
+
+      JsonObject message = new JsonObject()
+        .put("sender", sender)
+        .put("content", content);
+
+      dbService.addMessage(message, reply -> {
+        if (reply.succeeded()) {
+          // Redirect back to home page
+          ctx.response()
+            .setStatusCode(303)
+            .putHeader("Location", "/")
+            .end();
+        } else {
+          ctx.fail(reply.cause());
+        }
+      });
+    });
 
     server.requestHandler(router).listen(8080, ar -> {
       if (ar.succeeded()) {
@@ -42,55 +104,8 @@ public class HttpServerVerticle extends AbstractVerticle {
       }
     });
   }
-  // handlers
-  private void indexHandler(RoutingContext context) {
-    dbService.fetchMessages(reply -> {
-      if (reply.succeeded()) {
-
-        context.put("title", "Chat home");
-        context.put("messages", reply.result().getList());
-
-        templateEngine.render(context.data(), "templates/index.ftl", ar -> {
-          if (ar.succeeded()) {
-            context.response()
-              .putHeader("Content-Type", "text/html")
-              .end(ar.result());
-          } else {
-            context.fail(ar.cause());
-          }
-        });
-
-      } else {
-        LOGGER.error("Failed to fetch messages", reply.cause());
-        context.fail(reply.cause());
-      }
-    });
-  }
-
-  private void messageCreationHandler(RoutingContext context) {
-
-    String sender = context.request().getParam("sender");
-    String message = context.request().getParam("message");
-
-    if (sender == null || sender.isEmpty() ||
-      message == null || message.isEmpty()) {
-      context.response()
-        .setStatusCode(400)
-        .end("Sender and message must not be empty");
-      return;
-    }
-
-    dbService.createMessage(sender, message, reply -> {
-      if (reply.succeeded()) {
-        context.response()
-          .setStatusCode(303)
-          .putHeader("Location", "/")
-          .end();
-
-      } else {
-        LOGGER.error("Failed to create message", reply.cause());
-        context.fail(reply.cause());
-      }
-    });
-  }
 }
+
+
+
+

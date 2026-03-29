@@ -124,13 +124,12 @@ public class DatabaseServiceVertxProxyHandler extends ProxyHandler {
       if (action == null) throw new IllegalStateException("action not specified");
       accessed();
       switch (action) {
-        case "fetchMessages": {
-          service.fetchMessages(HelperUtils.createHandler(msg, includeDebugInfo));
+        case "getLastMessages": {
+          service.getLastMessages(HelperUtils.createHandler(msg, includeDebugInfo));
           break;
         }
-        case "createMessage": {
-          service.createMessage((java.lang.String)json.getValue("sender"),
-                        (java.lang.String)json.getValue("message"),
+        case "addMessage": {
+          service.addMessage((io.vertx.core.json.JsonObject)json.getValue("message"),
                         HelperUtils.createHandler(msg, includeDebugInfo));
           break;
         }

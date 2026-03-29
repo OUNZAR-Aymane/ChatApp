@@ -6,6 +6,7 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 import io.vertx.sqlclient.SqlClient;
 import java.util.HashMap;
 
@@ -13,9 +14,9 @@ import java.util.HashMap;
 public interface DatabaseService {
 
   @Fluent
-  DatabaseService fetchMessages(Handler<AsyncResult<JsonArray>> resultHandler);
+  DatabaseService getLastMessages(Handler<AsyncResult<JsonArray>> resultHandler);
   @Fluent
-  DatabaseService createMessage(String sender, String message, Handler<AsyncResult<Void>> resultHandler);
+  DatabaseService addMessage(JsonObject message, Handler<AsyncResult<Void>> resultHandler);
 
   static DatabaseService create(SqlClient sqlClient,
                                 HashMap<SqlQuery, String> sqlQueries,

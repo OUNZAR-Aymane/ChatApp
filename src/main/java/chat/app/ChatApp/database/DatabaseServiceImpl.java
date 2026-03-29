@@ -4,6 +4,7 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 import io.vertx.sqlclient.SqlClient;
 import io.vertx.sqlclient.Tuple;
 import org.slf4j.Logger;
@@ -41,42 +42,46 @@ public class DatabaseServiceImpl implements DatabaseService {
   }
 
   @Override
-  public DatabaseService fetchMessages(Handler<AsyncResult<JsonArray>> resultHandler) {
+  public DatabaseService getLastMessages(Handler<AsyncResult<JsonArray>> resultHandler) {
     dbClient
       .query(sqlQueries.get(SqlQuery.ALL_MESSAGES))
       .execute()
       .onComplete(ar -> {
         if (ar.succeeded()) {
-          JsonArray messages = new JsonArray(ar.result()
-            .stream()
-            .map(row -> row.getString("content"))
-            .sorted()
-            .collect(Collectors.toList()));
+          JsonArray messages = new JsonArray(
+            ar.result().stream()
+              .map(row -> new JsonObject()
+                .put("sender", row.getString("sender"))
+                .put("content", row.getString("content"))
+              )
+              .collect(Collectors.toList())
+          );
           resultHandler.handle(Future.succeededFuture(messages));
         } else {
-          LOGGER.error("Database preparation error", ar.cause());
+          LOGGER.error("Database query error", ar.cause());
           resultHandler.handle(Future.failedFuture(ar.cause()));
         }
-
       });
     return this;
   }
 
   @Override
-  public DatabaseService createMessage(String sender, String message, Handler<AsyncResult<Void>> resultHandler) {
+  public DatabaseService addMessage(JsonObject message, Handler<AsyncResult<Void>> resultHandler) {
+    String sender = message.getString("sender");
+    String content = message.getString("content");
+
     dbClient
       .preparedQuery(sqlQueries.get(SqlQuery.CREATE_MESSAGE))
-      .execute(Tuple.of(sender, message))
+      .execute(Tuple.of(sender, content))
       .onComplete(ar -> {
         if (ar.succeeded()) {
           resultHandler.handle(Future.succeededFuture());
-        }
-        else {
+        } else {
           LOGGER.error("Database query error", ar.cause());
           resultHandler.handle(Future.failedFuture(ar.cause()));
         }
-
       });
     return this;
   }
+
 }
