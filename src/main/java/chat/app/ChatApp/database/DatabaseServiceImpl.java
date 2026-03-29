@@ -49,7 +49,7 @@ public class DatabaseServiceImpl implements DatabaseService {
         if (ar.succeeded()) {
           JsonArray messages = new JsonArray(ar.result()
             .stream()
-            .map(row -> row.getString("message"))
+            .map(row -> row.getString("content"))
             .sorted()
             .collect(Collectors.toList()));
           resultHandler.handle(Future.succeededFuture(messages));
