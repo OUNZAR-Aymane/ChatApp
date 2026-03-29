@@ -9,6 +9,8 @@ import io.vertx.sqlclient.SqlClient;
 import io.vertx.sqlclient.Tuple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.stream.Collectors;
 
@@ -18,6 +20,8 @@ public class DatabaseServiceImpl implements DatabaseService {
   private final HashMap<SqlQuery, String> sqlQueries;
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseServiceImpl.class);
+
+  DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
   public DatabaseServiceImpl(SqlClient dbClient,
                              HashMap<SqlQuery, String> sqlQueries,
@@ -53,6 +57,7 @@ public class DatabaseServiceImpl implements DatabaseService {
               .map(row -> new JsonObject()
                 .put("sender", row.getString("sender"))
                 .put("content", row.getString("content"))
+                .put("created_at", row.getLocalDateTime("created_at").format(formatter))
               )
               .collect(Collectors.toList())
           );

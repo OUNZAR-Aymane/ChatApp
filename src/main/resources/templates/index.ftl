@@ -5,7 +5,9 @@
     <#if messages?? && messages?size gt 0>
       <#list messages as msg>
         <div class="message">
-          <strong>${msg.sender}</strong>: ${msg.content}
+          <strong>${msg.sender}</strong>
+          <span class="date">${msg.created_at}</span><br/>
+          ${msg.content}
         </div>
       </#list>
     <#else>
