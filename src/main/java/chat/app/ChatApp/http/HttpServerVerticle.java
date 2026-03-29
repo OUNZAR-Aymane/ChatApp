@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 
-import static chat.app.ChatApp.database.DatabaseVerticle.CONFIG_WIKIDB_QUEUE;
+import static chat.app.ChatApp.database.DatabaseVerticle.CONFIG_DB_QUEUE;
 
 public class HttpServerVerticle extends AbstractVerticle {
   private FreeMarkerTemplateEngine templateEngine;
@@ -26,15 +26,15 @@ public class HttpServerVerticle extends AbstractVerticle {
   @Override
   public void start(Promise<Void> startPromise) throws Exception {
     templateEngine = FreeMarkerTemplateEngine.create(vertx);
-    String wikiDbQueue = config().getString(CONFIG_WIKIDB_QUEUE, "wikidb.queue");
+    String DbQueue = config().getString(CONFIG_DB_QUEUE, "db.queue");
 
-    dbService = DatabaseService.createProxy(vertx, wikiDbQueue);
+    dbService = DatabaseService.createProxy(vertx, DbQueue);
     HttpServer server = vertx.createHttpServer();
   }
   private void indexHandler(RoutingContext context) {
     dbService.fetchAllPages(reply -> {
       if (reply.succeeded()) {
-        context.put("title", "Wiki home");
+        context.put("title", "Chat home");
         context.put("pages", reply.result().getList());
         templateEngine.render(context.data(), "/templates/index.ftl", ar -> {
           if (ar.succeeded()) {
@@ -81,7 +81,7 @@ public class HttpServerVerticle extends AbstractVerticle {
   }
   private void pageCreateHandler(RoutingContext context) {
     String pageName = context.request().getParam("name");
-    String location = "/wiki/" + pageName;
+    String location = "/chat/" + pageName;
     if (pageName == null || pageName.isEmpty()) {
       location = "/";
     }
@@ -94,7 +94,7 @@ public class HttpServerVerticle extends AbstractVerticle {
     Handler<AsyncResult<Void>> handler = reply -> {
       if (reply.succeeded()) {
         context.response().setStatusCode(303);
-        context.response().putHeader("Location", "/wiki/" + title);
+        context.response().putHeader("Location", "/chat/" + title);
         context.response().end();
       } else {
         context.fail(reply.cause());

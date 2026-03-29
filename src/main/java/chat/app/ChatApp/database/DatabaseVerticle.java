@@ -17,11 +17,11 @@ import java.util.Properties;
 
 public class DatabaseVerticle extends AbstractVerticle {
 
-  public static final String CONFIG_WIKIDB_QUEUE = "chatdb.queue";
-  public static final String CONFIG_WIKIDB_SQL_QUERIES_RESOURCE_FILE = "chatdb.sqlqueries.resource.file";
+  public static final String CONFIG_DB_QUEUE = "chatdb.queue";
+  public static final String CONFIG_DB_SQL_QUERIES_RESOURCE_FILE = "chatdb.sqlqueries.resource.file";
 
   private HashMap<SqlQuery, String> loadSqlQueries() throws IOException {
-    String queriesFile = config().getString(CONFIG_WIKIDB_SQL_QUERIES_RESOURCE_FILE);
+    String queriesFile = config().getString(CONFIG_DB_SQL_QUERIES_RESOURCE_FILE);
     InputStream queriesInputStream;
     if (queriesFile != null) {
       queriesInputStream = new FileInputStream(queriesFile);
@@ -62,7 +62,7 @@ public class DatabaseVerticle extends AbstractVerticle {
 
     DatabaseService.create(dbClient, sqlQueries, ready -> {
       if (ready.succeeded()) {
-        ProxyHelper.registerService(DatabaseService.class, vertx, ready.result(), CONFIG_WIKIDB_QUEUE);
+        ProxyHelper.registerService(DatabaseService.class, vertx, ready.result(), CONFIG_DB_QUEUE);
         startPromise.complete();
       } else {
         startPromise.fail(ready.cause());

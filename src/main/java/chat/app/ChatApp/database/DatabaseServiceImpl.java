@@ -83,6 +83,4 @@ public class DatabaseServiceImpl implements DatabaseService {
       });
     return this;
   }
-
-
 }

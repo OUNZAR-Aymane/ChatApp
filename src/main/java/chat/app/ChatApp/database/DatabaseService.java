@@ -25,5 +25,4 @@ public interface DatabaseService {
   static DatabaseService createProxy(Vertx vertx, String address) {
     return new DatabaseServiceVertxEBProxy(vertx, address);
   }
-
 }
