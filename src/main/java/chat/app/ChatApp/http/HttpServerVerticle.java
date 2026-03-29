@@ -32,7 +32,7 @@ public class HttpServerVerticle extends AbstractVerticle {
     HttpServer server = vertx.createHttpServer();
   }
   private void indexHandler(RoutingContext context) {
-    dbService.fetchAllPages(reply -> {
+    dbService.fetchMessages(reply -> {
       if (reply.succeeded()) {
         context.put("title", "Chat home");
         context.put("pages", reply.result().getList());
@@ -49,6 +49,11 @@ public class HttpServerVerticle extends AbstractVerticle {
       }
     });
   }
+  private void messageCreationHandler(RoutingContext context) {
+    dbService.createMessage(reply -> {
+    });
+  }
+  // ça ça vient du TP
   private static final String EMPTY_PAGE_MARKDOWN = """
   # A new page
   Feel-free to write in Markdown!
