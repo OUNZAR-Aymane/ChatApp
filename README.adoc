@@ -4,6 +4,27 @@ image:https://img.shields.io/badge/vert.x-4.5.25-purple.svg[link="https://vertx.
 
 This application was generated using http://start.vertx.io
 
+== Database setup
+
+1. Install PostgreSQL and then run in terminal:
+
+```
+psql postgres
+```
+
+2. Then create a user and a database:
+
+```
+CREATE ROLE "user" WITH LOGIN PASSWORD 'secret';
+CREATE DATABASE "the-db" OWNER "user";
+```
+
+3. Type \q to leave and then run in terminal:
+
+```
+psql -d the-db -U user
+```
+
 == Building
 
 To launch your tests:
