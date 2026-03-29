@@ -32,9 +32,9 @@ public class DatabaseVerticle extends AbstractVerticle {
     queriesProps.load(queriesInputStream);
     queriesInputStream.close();
     HashMap<SqlQuery, String> sqlQueries = new HashMap<>();
-    sqlQueries.put(SqlQuery.CREATE_MESSAGES_TABLE, queriesProps.getProperty("create-pages-table"));
-    sqlQueries.put(SqlQuery.ALL_MESSAGES, queriesProps.getProperty("all-pages"));
-    sqlQueries.put(SqlQuery.CREATE_MESSAGE, queriesProps.getProperty("create-page"));
+    sqlQueries.put(SqlQuery.CREATE_MESSAGES_TABLE, queriesProps.getProperty("create-messages-table"));
+    sqlQueries.put(SqlQuery.ALL_MESSAGES, queriesProps.getProperty("all-messages"));
+    sqlQueries.put(SqlQuery.CREATE_MESSAGE, queriesProps.getProperty("create-message"));
     return sqlQueries;
   }
   @Override
