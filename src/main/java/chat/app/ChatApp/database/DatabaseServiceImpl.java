@@ -36,8 +36,6 @@ public class DatabaseServiceImpl implements DatabaseService {
           readyHandler.handle(Future.failedFuture(ar.cause()));
         }
 
-        // Now close the pool
-        dbClient.close();
       });
 
   }
@@ -60,8 +58,6 @@ public class DatabaseServiceImpl implements DatabaseService {
           resultHandler.handle(Future.failedFuture(ar.cause()));
         }
 
-        // Now close the pool
-        dbClient.close();
       });
     return this;
   }
@@ -79,7 +75,7 @@ public class DatabaseServiceImpl implements DatabaseService {
           LOGGER.error("Database query error", ar.cause());
           resultHandler.handle(Future.failedFuture(ar.cause()));
         }
-        dbClient.close();
+
       });
     return this;
   }
