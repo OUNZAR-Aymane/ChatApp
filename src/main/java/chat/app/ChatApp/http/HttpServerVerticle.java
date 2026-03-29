@@ -8,6 +8,7 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.BodyHandler;
+import io.vertx.ext.web.handler.StaticHandler;
 import io.vertx.ext.web.templ.freemarker.FreeMarkerTemplateEngine;
 
 import org.slf4j.Logger;
@@ -28,6 +29,7 @@ public class HttpServerVerticle extends AbstractVerticle {
 
     HttpServer server = vertx.createHttpServer();
     Router router = Router.router(vertx);
+    router.route("/static/*").handler(StaticHandler.create("webroot"));
     router.route().handler(BodyHandler.create());
 
     // GET / -> render index.ftl
