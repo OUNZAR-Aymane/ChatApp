@@ -87,6 +87,11 @@
       <version>2.0.17</version>
       <scope>compile</scope>
     </dependency>
+    <dependency>
+      <groupId>com.ongres.scram</groupId>
+      <artifactId>scram-client</artifactId>
+      <version>3.2</version>
+    </dependency>
   </dependencies>
 
   <build>
