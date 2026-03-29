@@ -22,7 +22,7 @@ public class HttpServerVerticle extends AbstractVerticle {
   @Override
   public void start(Promise<Void> startPromise) {
     templateEngine = FreeMarkerTemplateEngine.create(vertx);
-    String dbQueue = config().getString("db.queue", "db.queue");
+    String dbQueue = config().getString("db.queue", "chatdb.queue");
     dbService = DatabaseService.createProxy(vertx, dbQueue);
 
     HttpServer server = vertx.createHttpServer();
