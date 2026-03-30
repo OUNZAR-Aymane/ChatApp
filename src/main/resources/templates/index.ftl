@@ -41,5 +41,14 @@
 <script src="https://cdn.jsdelivr.net/npm/sockjs-client/dist/sockjs.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/vertx3-eventbus-client/vertx-eventbus.min.js"></script>
 <script src="/js/chat.js"></script>
+<script>
+  window.addEventListener('load', () => {
+    const container = document.getElementById('messages');
+    if (container) {
+      // scroll to bottom on page load
+      container.scrollTop = container.scrollHeight;
+    }
+  });
+</script>
 
 <#include "footer.ftl">
