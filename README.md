@@ -1,6 +1,17 @@
 # Chatapp
-
 ![vert.x](https://img.shields.io/badge/vert.x-4.5.25-purple.svg)
+
+Real-time chat application built with Vert.x, a PostgreSQL SQL database, and a web interface.
+
+Supports message persistence, REST API, and real-time messaging using WebSockets.
+
+Getting and posting messages is available on the front end.
+
+Putting and deleting them has been done on the backend but not on the front end.
+
+Deploying the main verticle and adding and getting messages have been tested.
+
+<img src="./assets/interface.png" height="400" style="object-fit: contain;">
 
 This application was generated using http://start.vertx.io
 
