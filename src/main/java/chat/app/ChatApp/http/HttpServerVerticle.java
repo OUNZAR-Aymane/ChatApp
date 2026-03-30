@@ -14,6 +14,10 @@ import io.vertx.ext.web.templ.freemarker.FreeMarkerTemplateEngine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.vertx.ext.web.handler.sockjs.SockJSHandler;
+import io.vertx.ext.web.handler.sockjs.SockJSBridgeOptions;
+import io.vertx.ext.bridge.PermittedOptions;
+
 public class HttpServerVerticle extends AbstractVerticle {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(HttpServerVerticle.class);
@@ -31,6 +35,12 @@ public class HttpServerVerticle extends AbstractVerticle {
     Router router = Router.router(vertx);
     router.route("/static/*").handler(StaticHandler.create("webroot"));
     router.route().handler(BodyHandler.create());
+
+    SockJSBridgeOptions options = new SockJSBridgeOptions()
+      .addInboundPermitted(new PermittedOptions().setAddress("chat.message"))
+      .addOutboundPermitted(new PermittedOptions().setAddress("chat.message"));
+
+    router.mountSubRouter("/eventbus", SockJSHandler.create(vertx).bridge(options));
 
     // GET / -> render index.ftl
     router.get("/").handler(ctx -> {
@@ -85,6 +95,8 @@ public class HttpServerVerticle extends AbstractVerticle {
 
       dbService.addMessage(message, reply -> {
         if (reply.succeeded()) {
+          // send to all clients
+          vertx.eventBus().publish("chat.message", message);
           // Redirect back to home page
           ctx.response()
             .setStatusCode(303)
