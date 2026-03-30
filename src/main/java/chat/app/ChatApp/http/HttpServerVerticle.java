@@ -118,14 +118,30 @@ public class HttpServerVerticle extends AbstractVerticle {
       dbService.updateMessage(id, content, reply -> {
         if (reply.succeeded()) {
           // "reply.result()" contient maintenant la date venant DIRECTEMENT de la DB
-          String dbDate = reply.result(); 
-          
+          String dbDate = reply.result();
+
           vertx.eventBus().publish("chat.update", new JsonObject()
             .put("id", id)
             .put("content", content)
             .put("updated_at", dbDate)); // C'est la date de la DB !
-            
+
           ctx.response().setStatusCode(200).end();
+        } else {
+          ctx.fail(reply.cause());
+        }
+      });
+    });
+
+    // DELETE /api/messages
+    router.delete("/api/messages").handler(ctx -> {
+      JsonObject body = ctx.body().asJsonObject();
+      int id = body.getInteger("id");
+
+      // On appelle le service sans générer de date ici
+      dbService.deleteMessage(id, reply -> {
+        if (reply.succeeded()) {
+
+          ctx.response().setStatusCode(200).end("deleted successfully");
         } else {
           ctx.fail(reply.cause());
         }

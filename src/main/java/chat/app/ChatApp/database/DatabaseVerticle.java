@@ -36,6 +36,7 @@ public class DatabaseVerticle extends AbstractVerticle {
     sqlQueries.put(SqlQuery.ALL_MESSAGES, queriesProps.getProperty("all-messages"));
     sqlQueries.put(SqlQuery.CREATE_MESSAGE, queriesProps.getProperty("create-message"));
     sqlQueries.put(SqlQuery.UPDATE_MESSAGE, queriesProps.getProperty("update-message"));
+    sqlQueries.put(SqlQuery.DELETE_MESSAGE, queriesProps.getProperty("delete-message"));
     return sqlQueries;
   }
   @Override

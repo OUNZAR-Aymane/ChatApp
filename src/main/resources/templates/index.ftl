@@ -15,11 +15,12 @@
                   ${msg.created_at}
                 </#if>
               </span>
-              <button class="btn-edit" onclick="startEdit(${msg.id})">✏️</button>              
+              <button class="btn-edit" onclick="startEdit(${msg.id})">✏️</button>
+              <button class="btn-edit" onclick="deleteMessage(${msg.id})">✏Delete</button>
             </div>
           </div>
           <div class="msg-content" style="margin-top: 2px;">${msg.content}</div>
-          
+
           <#-- Formulaire d'édition -->
           <div class="edit-form" id="edit-${msg.id}" style="display:none; margin-top: 6px;">
             <textarea class="edit-textarea" id="edit-text-${msg.id}">${msg.content}</textarea>
@@ -140,6 +141,20 @@
       cancelEdit(id);
     } catch (err) {
       console.error("Erreur sauvegarde:", err);
+    }
+  }
+  async function deleteMessage(id) {
+    msg = document.getElementById("msg-"+id);
+    try {
+      await fetch("/api/messages", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: id, })
+
+      });
+      msg.style.display = "none"
+    } catch (err) {
+      console.error("Erreur de suppresion:", err);
     }
   }
 
