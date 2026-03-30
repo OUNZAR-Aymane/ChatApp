@@ -63,18 +63,18 @@ public class DatabaseServiceImpl implements DatabaseService {
                 .put("sender", row.getString("sender"))
                 .put("content", row.getString("content"))
                 .put("created_at", row.getLocalDateTime("created_at").format(formatter));
-              
+
               // 2. ON AJOUTE LA VÉRIFICATION ICI
               // Si updated_at n'est pas vide dans la base, on l'ajoute au JSON
               if (row.getLocalDateTime("updated_at") != null) {
                 json.put("updated_at", row.getLocalDateTime("updated_at").format(formatter));
               }
-              
+
               return json;
             })
             .collect(Collectors.toList())
         );
-        
+
         resultHandler.handle(Future.succeededFuture(messages));
         } else {
           LOGGER.error("Database query error", ar.cause());
@@ -112,6 +112,18 @@ public class DatabaseServiceImpl implements DatabaseService {
           // On la formate (sans secondes et avec des slashes pour ton format)
           String formattedDate = dbDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
           resultHandler.handle(Future.succeededFuture(formattedDate));
+        } else {
+          resultHandler.handle(Future.failedFuture(res.cause()));
+        }
+      });
+    return this;
+  }
+  @Override
+  public DatabaseService deleteMessage(int id, Handler<AsyncResult<String>> resultHandler) {
+    dbClient.preparedQuery(sqlQueries.get(SqlQuery.DELETE_MESSAGE))
+      .execute(Tuple.of(id), res -> {
+        if (res.succeeded()) {
+          resultHandler.handle(Future.succeededFuture("le message a été supprimé avec succes"));
         } else {
           resultHandler.handle(Future.failedFuture(res.cause()));
         }
