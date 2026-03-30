@@ -11,7 +11,9 @@ Putting and deleting them has been done on the backend but not on the front end.
 
 Deploying the main verticle and adding and getting messages have been tested.
 
-<img src="./assets/interface.png" height="400" style="object-fit: contain;">
+<p align="center">
+  <img src="./assets/interface.png" height="500" style="object-fit: contain;">
+</p>
 
 This application was generated using http://start.vertx.io
 
