@@ -11,6 +11,8 @@ Putting and deleting them has been done on the backend but not on the front end.
 
 Deploying the main verticle and adding and getting messages have been tested.
 
+Below you can see the interface:
+
 <p align="center">
   <img src="./assets/interface.png" height="500" style="object-fit: contain;">
 </p>
