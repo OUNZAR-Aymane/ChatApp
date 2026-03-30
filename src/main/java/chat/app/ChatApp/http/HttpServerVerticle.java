@@ -33,7 +33,8 @@ public class HttpServerVerticle extends AbstractVerticle {
 
     HttpServer server = vertx.createHttpServer();
     Router router = Router.router(vertx);
-    router.route("/static/*").handler(StaticHandler.create("webroot"));
+    router.route("/js/*").handler(StaticHandler.create("webroot/js"));
+    router.route("/css/*").handler(StaticHandler.create("webroot/css"));
     router.route().handler(BodyHandler.create());
 
     SockJSBridgeOptions options = new SockJSBridgeOptions()
