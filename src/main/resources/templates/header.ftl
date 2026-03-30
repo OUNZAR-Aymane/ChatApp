@@ -12,4 +12,5 @@
   <title>ChatApp</title>
 </head>
 <body>
+<div class="container container-main">
 <div class="container">

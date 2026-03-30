@@ -1,4 +1,12 @@
 </div> <!-- .container -->
+</div> <!-- .container-main -->
+
+<footer style="background:#222; color:white; text-align:center; padding:20px 0; width:100%;">
+  <p>Project - ChatApp</p>
+  <p><strong>Group Members:</strong> Reda, Aymane, Youssef, Khalilerrahmene, Loqman</p>
+  <small>&copy; 2026 IMT Atlantique</small>
+</footer>
+
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"
         integrity="sha384-3ceskX3iaEnIogmQchP8opvBy3Mi7Ce34nWjpBIwVTHfGYWQS9jwHDVRnpKKHJg7"
         crossorigin="anonymous"></script>
