@@ -17,6 +17,8 @@ public interface DatabaseService {
   DatabaseService getLastMessages(Handler<AsyncResult<JsonArray>> resultHandler);
   @Fluent
   DatabaseService addMessage(JsonObject message, Handler<AsyncResult<Void>> resultHandler);
+  @Fluent
+  DatabaseService updateMessage(int id, String content, Handler<AsyncResult<String>> resultHandler);
 
   static DatabaseService create(SqlClient sqlClient,
                                 HashMap<SqlQuery, String> sqlQueries,
@@ -26,4 +28,5 @@ public interface DatabaseService {
   static DatabaseService createProxy(Vertx vertx, String address) {
     return new DatabaseServiceVertxEBProxy(vertx, address);
   }
+  
 }

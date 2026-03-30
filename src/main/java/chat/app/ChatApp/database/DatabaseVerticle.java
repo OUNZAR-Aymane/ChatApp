@@ -1,20 +1,19 @@
 package chat.app.ChatApp.database;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Properties;
+
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Promise;
-import io.vertx.core.json.JsonObject;
 import io.vertx.pgclient.PgBuilder;
 import io.vertx.pgclient.PgConnectOptions;
 import io.vertx.pgclient.SslMode;
 import io.vertx.serviceproxy.ProxyHelper;
 import io.vertx.sqlclient.PoolOptions;
 import io.vertx.sqlclient.SqlClient;
-
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Properties;
 
 public class DatabaseVerticle extends AbstractVerticle {
 
@@ -36,6 +35,7 @@ public class DatabaseVerticle extends AbstractVerticle {
     sqlQueries.put(SqlQuery.CREATE_MESSAGES_TABLE, queriesProps.getProperty("create-messages-table"));
     sqlQueries.put(SqlQuery.ALL_MESSAGES, queriesProps.getProperty("all-messages"));
     sqlQueries.put(SqlQuery.CREATE_MESSAGE, queriesProps.getProperty("create-message"));
+    sqlQueries.put(SqlQuery.UPDATE_MESSAGE, queriesProps.getProperty("update-message"));
     return sqlQueries;
   }
   @Override

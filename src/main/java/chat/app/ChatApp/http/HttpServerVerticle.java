@@ -1,22 +1,20 @@
 package chat.app.ChatApp.http;
 
-import chat.app.ChatApp.database.DatabaseService;
-
-import io.vertx.core.*;
-import io.vertx.core.http.HttpServer;
-import io.vertx.core.json.JsonObject;
-import io.vertx.ext.web.Router;
-import io.vertx.ext.web.RoutingContext;
-import io.vertx.ext.web.handler.BodyHandler;
-import io.vertx.ext.web.handler.StaticHandler;
-import io.vertx.ext.web.templ.freemarker.FreeMarkerTemplateEngine;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.vertx.ext.web.handler.sockjs.SockJSHandler;
-import io.vertx.ext.web.handler.sockjs.SockJSBridgeOptions;
+import chat.app.ChatApp.database.DatabaseService;
+import io.vertx.core.AbstractVerticle;
+import io.vertx.core.Promise;
+import io.vertx.core.http.HttpServer;
+import io.vertx.core.json.JsonObject;
 import io.vertx.ext.bridge.PermittedOptions;
+import io.vertx.ext.web.Router;
+import io.vertx.ext.web.handler.BodyHandler;
+import io.vertx.ext.web.handler.StaticHandler;
+import io.vertx.ext.web.handler.sockjs.SockJSBridgeOptions;
+import io.vertx.ext.web.handler.sockjs.SockJSHandler;
+import io.vertx.ext.web.templ.freemarker.FreeMarkerTemplateEngine;
 
 public class HttpServerVerticle extends AbstractVerticle {
 
@@ -39,7 +37,9 @@ public class HttpServerVerticle extends AbstractVerticle {
 
     SockJSBridgeOptions options = new SockJSBridgeOptions()
       .addInboundPermitted(new PermittedOptions().setAddress("chat.message"))
-      .addOutboundPermitted(new PermittedOptions().setAddress("chat.message"));
+      .addOutboundPermitted(new PermittedOptions().setAddress("chat.message"))
+      .addInboundPermitted(new PermittedOptions().setAddress("chat.update"))
+      .addOutboundPermitted(new PermittedOptions().setAddress("chat.update"));
 
     router.mountSubRouter("/eventbus", SockJSHandler.create(vertx).bridge(options));
 
@@ -103,6 +103,29 @@ public class HttpServerVerticle extends AbstractVerticle {
             .setStatusCode(303)
             .putHeader("Location", "/")
             .end();
+        } else {
+          ctx.fail(reply.cause());
+        }
+      });
+    });
+    // PUT /api/messages
+    router.put("/api/messages").handler(ctx -> {
+      JsonObject body = ctx.body().asJsonObject();
+      int id = body.getInteger("id");
+      String content = body.getString("content");
+
+      // On appelle le service sans générer de date ici
+      dbService.updateMessage(id, content, reply -> {
+        if (reply.succeeded()) {
+          // "reply.result()" contient maintenant la date venant DIRECTEMENT de la DB
+          String dbDate = reply.result(); 
+          
+          vertx.eventBus().publish("chat.update", new JsonObject()
+            .put("id", id)
+            .put("content", content)
+            .put("updated_at", dbDate)); // C'est la date de la DB !
+            
+          ctx.response().setStatusCode(200).end();
         } else {
           ctx.fail(reply.cause());
         }

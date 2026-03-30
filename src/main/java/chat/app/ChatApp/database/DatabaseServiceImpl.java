@@ -1,5 +1,13 @@
 package chat.app.ChatApp.database;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -7,12 +15,6 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.sqlclient.SqlClient;
 import io.vertx.sqlclient.Tuple;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.stream.Collectors;
 
 public class DatabaseServiceImpl implements DatabaseService {
 
@@ -52,16 +54,28 @@ public class DatabaseServiceImpl implements DatabaseService {
       .execute()
       .onComplete(ar -> {
         if (ar.succeeded()) {
-          JsonArray messages = new JsonArray(
-            ar.result().stream()
-              .map(row -> new JsonObject()
+        JsonArray messages = new JsonArray(
+          ar.result().stream()
+            .map(row -> {
+              // 1. On crée le JSON de base
+              JsonObject json = new JsonObject()
+                .put("id", row.getInteger("id"))
                 .put("sender", row.getString("sender"))
                 .put("content", row.getString("content"))
-                .put("created_at", row.getLocalDateTime("created_at").format(formatter))
-              )
-              .collect(Collectors.toList())
-          );
-          resultHandler.handle(Future.succeededFuture(messages));
+                .put("created_at", row.getLocalDateTime("created_at").format(formatter));
+              
+              // 2. ON AJOUTE LA VÉRIFICATION ICI
+              // Si updated_at n'est pas vide dans la base, on l'ajoute au JSON
+              if (row.getLocalDateTime("updated_at") != null) {
+                json.put("updated_at", row.getLocalDateTime("updated_at").format(formatter));
+              }
+              
+              return json;
+            })
+            .collect(Collectors.toList())
+        );
+        
+        resultHandler.handle(Future.succeededFuture(messages));
         } else {
           LOGGER.error("Database query error", ar.cause());
           resultHandler.handle(Future.failedFuture(ar.cause()));
@@ -88,5 +102,20 @@ public class DatabaseServiceImpl implements DatabaseService {
       });
     return this;
   }
-
+  @Override
+  public DatabaseService updateMessage(int id, String content, Handler<AsyncResult<String>> resultHandler) {
+    dbClient.preparedQuery(sqlQueries.get(SqlQuery.UPDATE_MESSAGE))
+      .execute(Tuple.of(content, id), res -> {
+        if (res.succeeded() && res.result().size() > 0) {
+          // On récupère la date générée par la base de données
+          LocalDateTime dbDate = res.result().iterator().next().getLocalDateTime("updated_at");
+          // On la formate (sans secondes et avec des slashes pour ton format)
+          String formattedDate = dbDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
+          resultHandler.handle(Future.succeededFuture(formattedDate));
+        } else {
+          resultHandler.handle(Future.failedFuture(res.cause()));
+        }
+      });
+    return this;
+  }
 }
