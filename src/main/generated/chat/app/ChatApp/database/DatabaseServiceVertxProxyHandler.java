@@ -139,6 +139,11 @@ public class DatabaseServiceVertxProxyHandler extends ProxyHandler {
                         HelperUtils.createHandler(msg, includeDebugInfo));
           break;
         }
+        case "deleteMessage": {
+          service.deleteMessage(json.getValue("id") == null ? null : (json.getLong("id").intValue()),
+                        HelperUtils.createHandler(msg, includeDebugInfo));
+          break;
+        }
         default: throw new IllegalStateException("Invalid action: " + action);
       }
     } catch (Throwable t) {

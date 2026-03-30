@@ -39,7 +39,10 @@ public class HttpServerVerticle extends AbstractVerticle {
       .addInboundPermitted(new PermittedOptions().setAddress("chat.message"))
       .addOutboundPermitted(new PermittedOptions().setAddress("chat.message"))
       .addInboundPermitted(new PermittedOptions().setAddress("chat.update"))
-      .addOutboundPermitted(new PermittedOptions().setAddress("chat.update"));
+      .addOutboundPermitted(new PermittedOptions().setAddress("chat.update"))
+      .addInboundPermitted(new PermittedOptions().setAddress("chat.delete"))
+      .addOutboundPermitted(new PermittedOptions().setAddress("chat.delete"));
+
 
     router.mountSubRouter("/eventbus", SockJSHandler.create(vertx).bridge(options));
 
@@ -108,6 +111,7 @@ public class HttpServerVerticle extends AbstractVerticle {
         }
       });
     });
+
     // PUT /api/messages
     router.put("/api/messages").handler(ctx -> {
       JsonObject body = ctx.body().asJsonObject();
@@ -123,7 +127,7 @@ public class HttpServerVerticle extends AbstractVerticle {
           vertx.eventBus().publish("chat.update", new JsonObject()
             .put("id", id)
             .put("content", content)
-            .put("updated_at", dbDate)); // C'est la date de la DB !
+            .put("updated_at", dbDate));
 
           ctx.response().setStatusCode(200).end();
         } else {
@@ -137,9 +141,12 @@ public class HttpServerVerticle extends AbstractVerticle {
       JsonObject body = ctx.body().asJsonObject();
       int id = body.getInteger("id");
 
-      // On appelle le service sans générer de date ici
       dbService.deleteMessage(id, reply -> {
         if (reply.succeeded()) {
+          // Notify all clients a message has been deleted on chat.delete, not chat.update
+          vertx.eventBus().publish("chat.delete", new JsonObject()
+            .put("id", id)
+          );
 
           ctx.response().setStatusCode(200).end("deleted successfully");
         } else {
@@ -147,6 +154,7 @@ public class HttpServerVerticle extends AbstractVerticle {
         }
       });
     });
+
 
     server.requestHandler(router).listen(8080, ar -> {
       if (ar.succeeded()) {
